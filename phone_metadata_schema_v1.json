@@ -1,0 +1,615 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phone Metadata V1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "product_id",
+    "brand",
+    "model",
+    "aliases",
+    "release_date",
+    "variants",
+    "specs",
+    "evidence",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "release_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variant_id",
+          "ram_gb",
+          "storage_gb",
+          "region",
+          "color",
+          "offers"
+        ],
+        "properties": {
+          "variant_id": {
+            "type": "string"
+          },
+          "ram_gb": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "storage_gb": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "region": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "color": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "offers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "market",
+                "currency",
+                "price",
+                "seller",
+                "availability",
+                "observed_at",
+                "source"
+              ],
+              "properties": {
+                "market": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "price": {
+                  "type": [
+                    "number",
+                    "null"
+                  ],
+                  "minimum": 0
+                },
+                "seller": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "availability": {
+                  "enum": [
+                    "in_stock",
+                    "out_of_stock",
+                    "preorder",
+                    "discontinued",
+                    "unknown"
+                  ]
+                },
+                "observed_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "url",
+                    "verified_at",
+                    "status"
+                  ],
+                  "properties": {
+                    "url": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "verified_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "status": {
+                      "enum": [
+                        "verified",
+                        "unverified",
+                        "conflicting"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "specs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chipset",
+        "display",
+        "battery",
+        "camera",
+        "software",
+        "connectivity"
+      ],
+      "properties": {
+        "chipset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "cpu",
+            "gpu"
+          ],
+          "properties": {
+            "name": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "cpu": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "gpu": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "display": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "technology",
+            "size_in",
+            "refresh_rate_hz",
+            "touch_sampling_rate_hz",
+            "resolution"
+          ],
+          "properties": {
+            "technology": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "size_in": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "refresh_rate_hz": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "touch_sampling_rate_hz": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "resolution": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "battery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capacity_mah",
+            "wired_charging_w",
+            "wireless_charging_w"
+          ],
+          "properties": {
+            "capacity_mah": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "wired_charging_w": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "wireless_charging_w": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        },
+        "camera": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "main_mp",
+            "ois",
+            "optical_zoom_x",
+            "video"
+          ],
+          "properties": {
+            "main_mp": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "ois": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "optical_zoom_x": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "video": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "software": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "os",
+            "support_until"
+          ],
+          "properties": {
+            "os": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "support_until": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "connectivity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cellular",
+            "wifi",
+            "bluetooth",
+            "nfc"
+          ],
+          "properties": {
+            "cellular": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "wifi": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "bluetooth": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "nfc": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "benchmarks",
+        "gaming_tests"
+      ],
+      "properties": {
+        "benchmarks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "version",
+              "score",
+              "variant_id",
+              "source"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "score": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "variant_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "url",
+                  "verified_at",
+                  "status"
+                ],
+                "properties": {
+                  "url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "verified_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "verified",
+                      "unverified",
+                      "conflicting"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "gaming_tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "game",
+              "settings",
+              "fps_average",
+              "fps_1pct_low",
+              "duration_min",
+              "variant_id",
+              "source"
+            ],
+            "properties": {
+              "game": {
+                "type": "string"
+              },
+              "settings": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "fps_average": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "fps_1pct_low": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "duration_min": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "variant_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "url",
+                  "verified_at",
+                  "status"
+                ],
+                "properties": {
+                  "url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "verified_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "verified",
+                      "unverified",
+                      "conflicting"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_file",
+        "extracted_at",
+        "verification_status",
+        "field_sources"
+      ],
+      "properties": {
+        "source_file": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extracted_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "verification_status": {
+          "enum": [
+            "verified",
+            "unverified",
+            "conflicting"
+          ]
+        },
+        "field_sources": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "url",
+              "verified_at",
+              "status"
+            ],
+            "properties": {
+              "url": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "verified_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "verified",
+                  "unverified",
+                  "conflicting"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

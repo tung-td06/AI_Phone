@@ -202,9 +202,11 @@ class BudgetParser:
     """
     # (pattern, multiplier_to_vnd)
     PATTERNS: List[Tuple[str, float]] = [
-        # "tầm/dưới/khoảng/max/tài chính X triệu/tr/củ/m"
-        (r"(?:duoi|tam|khoang|max|toi da|trong tam|tai chinh|ngan sach|budget|gia)\s*"
+        # "tầm/dưới/khoảng/max/tài chính/giá/có X triệu/tr/củ/m"
+        (r"(?:duoi|tam|khoang|max|toi da|trong tam|tai chinh|ngan sach|budget|gia|co)\s*"
          r"([\d]+(?:[.,]\d+)?)\s*(?:trieu|tr\b|cu\b|m\b|million)", 1_000_000.0),
+        # Đứng đầu câu hoặc sau điện thoại/máy: "25 triệu mua máy gì", "dien thoai 25 trieu"
+        (r"(?:^|\b(?:dien thoai|may|phone)\s+)([\d]+(?:[.,]\d+)?)\s*(?:trieu|tr\b|cu\b|m\b)\b", 1_000_000.0),
         # "khoảng 15.000.000 đồng/VND"
         (r"(?:duoi|tam|khoang|max|toi da|trong tam|tai chinh|ngan sach|budget|gia)\s*"
          r"([\d]{1,3}(?:[.,]\d{3})+)\s*(?:dong|vnd)?", 1.0),
@@ -923,8 +925,20 @@ class ProductRanker:
                 for v, u in ram_ms
             )
 
-        hz_ms = re.findall(r"(\d{2,3})\s*Hz", combined, re.IGNORECASE)
-        profile.display_hz = max(int(h) for h in hz_ms) if hz_ms else 60
+        # Tần số quét màn hình (Display Refresh Rate): chỉ chấp nhận <= 240Hz, không lấy nhầm tần số cảm ứng (720Hz)
+        refresh_m = re.search(r"Display Refresh Rate:\s*(\d+)\s*Hz", combined, re.IGNORECASE)
+        if refresh_m:
+            hz_val = int(refresh_m.group(1))
+            profile.display_hz = hz_val if hz_val in [60, 90, 120, 144, 165, 185, 240] else 60
+        else:
+            disp_rates = []
+            for m in re.finditer(r"\b(60|90|120|144|165|185|240)\s*Hz\b", combined, re.IGNORECASE):
+                start = max(0, m.start() - 25)
+                end = min(len(combined), m.end() + 25)
+                surrounding = combined[start:end].lower()
+                if "touch" not in surrounding and "cam ung" not in surrounding:
+                    disp_rates.append(int(m.group(1)))
+            profile.display_hz = max(disp_rates) if disp_rates else 60
 
         bat_m = re.search(r"Nominal Battery Capacity:\s*(\d+)\s*mAh", combined, re.IGNORECASE)
         if not bat_m:
@@ -999,17 +1013,18 @@ class ProductRanker:
         if soc.confidence == "UNKNOWN":
             total = round(total * 0.90, 1)  # UNKNOWN penalty -10%
 
+        fps_val = "Chưa có dữ liệu benchmark chính thức" if soc.confidence == "UNKNOWN" else soc.target_fps_gaming
         details = {
             "CPU": f"{cpu_s}/35 ({soc.canonical_name})",
             "GPU": f"{gpu_s}/35 ({p.gpu_name})",
             "RAM": f"{ram_s}/12 ({p.ram_gb}GB)",
             "Man": f"{disp_s}/10 ({p.display_hz}Hz)",
             "Pin": f"{bc_s}/8 ({p.battery_mah}mAh)",
-            "FPS": soc.target_fps_gaming,
+            "FPS": fps_val,
             "Trust": soc.confidence,
         }
         expl = (
-            f"SoC {p.cpu_name} UNKNOWN benchmark — bao luu diem an toan {total}/100 (giam 10%)."
+            f"SoC {p.cpu_name} chưa có benchmark chính thức — bảo lưu điểm cơ bản {total}/100."
             if soc.confidence == "UNKNOWN"
             else f"{soc.canonical_name} GPU {gpu_s}/35, {p.display_hz}Hz, {p.ram_gb}GB. FPS: {soc.target_fps_gaming}."
         )
