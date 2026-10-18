@@ -76,8 +76,10 @@ DEFAULT_TOP_K       = 5
 BM25_CACHE_FILENAME = "bm25_index.pkl"
 
 EXCHANGE_RATES_TO_VND: Dict[str, float] = {
-    "USD": 25_000.0, "EUR": 27_000.0, "GBP": 32_000.0, "CNY": 3_500.0,
-    "MXN": 1_300.0,  "JPY": 165.0,   "KRW": 18.0,     "INR": 300.0, "VND": 1.0,
+    "USD": 25_000.0, "EUR": 27_000.0, "GBP": 32_000.0, "CNY": 3_500.0, "RMB": 3_500.0,
+    "MXN": 1_300.0,  "JPY": 165.0,   "KRW": 18.0,     "INR": 300.0,   "VND": 1.0,
+    "CAD": 18_000.0, "AUD": 16_000.0, "TWD": 780.0,   "SGD": 18_500.0, "MYR": 5_600.0,
+    "HKD": 3_200.0,  "THB": 700.0,   "IDR": 1.6,      "RUB": 260.0,   "BRL": 4_500.0,
 }
 
 KNOWN_BRANDS: List[str] = [
@@ -809,18 +811,32 @@ class HybridRetriever:
 class AdvancedPriceParser:
     """P2: Parser giá nâng cao — đọc VND / USD / CNY / EUR từ nhiều format."""
     PATTERNS: List[Tuple[str, str]] = [
-        # "Price: 999\n- USD"  (format trong chunks)
-        (r"Price:\s*([\d,\.]+)\s*(?:\n\s*-\s*([A-Za-z]+))?", "DETECT"),
-        # "Giá: 22.990.000 VND" / "22,990,000₫"
-        (r"(?:Gia|gia ban|price):\s*([\d,\.]+)\s*(?:VND|dong|vnd)?", "VND"),
-        # Số 7+ chữ số + VND
-        (r"([\d]{7,})\s*(?:VND|dong)", "VND"),
+        # Format chuẩn phổ biến nhất trong chunks (Price: 3999 \n - CNY)
+        (r"Price:\s*([\d,\.]+)\s*\n\s*-\s*([A-Za-z]{3,4})", "DETECT"),
+        # Single line: Price: 3999 CNY
+        (r"Price:\s*([\d,\.]+)\s+([A-Za-z]{3,4})\b", "DETECT"),
+        # "¥3299" / "CNY 3299" / "3299 CNY" / "3299 RMB"
+        (r"[¥￥]\s*([\d,\.]+)", "CNY"),
+        (r"CNY\s*([\d,\.]+)", "CNY"),
+        (r"([\d,\.]+)\s*(?:CNY|RMB|Yuan|te\b)", "CNY"),
         # "$999" / "USD 999"
         (r"\$\s*([\d,\.]+)", "USD"),
         (r"USD\s*([\d,\.]+)", "USD"),
-        # "¥3299" / "CNY 3299"
-        (r"[¥￥]\s*([\d,\.]+)", "CNY"),
-        (r"CNY\s*([\d,\.]+)", "CNY"),
+        # "€899" / "EUR 899"
+        (r"[€]\s*([\d,\.]+)", "EUR"),
+        (r"EUR\s*([\d,\.]+)", "EUR"),
+        # "£699" / "GBP 699"
+        (r"[£]\s*([\d,\.]+)", "GBP"),
+        (r"GBP\s*([\d,\.]+)", "GBP"),
+        # "₹29999" / "INR 29999"
+        (r"[₹]\s*([\d,\.]+)", "INR"),
+        (r"INR\s*([\d,\.]+)", "INR"),
+        # "Giá: 22.990.000 VND" / "22,990,000₫"
+        (r"(?:Gia|gia ban|price):\s*([\d,\.]+)\s*(?:VND|dong|vnd|d)?", "VND"),
+        # Số 7+ chữ số + VND
+        (r"([\d]{7,})\s*(?:VND|dong|d)", "VND"),
+        # Fallback: Price: 999
+        (r"Price:\s*([\d,\.]+)", "USD"),
     ]
 
     @classmethod
