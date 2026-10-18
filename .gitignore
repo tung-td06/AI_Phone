@@ -1,0 +1,25 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Models & Large Checkpoints (>100MB exceeds GitHub limits)
+checkpoints_phone_embedding/
+final_phone_embedding_model/
+dataset_finetune/
+phone_vector_db/
+rag_db/
+
+# Binary & Index files
+*.faiss
+*.pkl
+*.bin
+*.safetensors
+*.pth
+*.onnx
+
+# IDE & OS files
+.vscode/
+.idea/
+*.log
+.DS_Store
