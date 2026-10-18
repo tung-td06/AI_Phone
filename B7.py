@@ -69,8 +69,9 @@ from soc_database import lookup_soc_benchmark, SoCBenchmarkInfo, KNOWN_SOC_DATAB
 # ==============================================================================
 # HẰNG SỐ CẤU HÌNH HỆ THỐNG
 # ==============================================================================
-DEFAULT_MODEL_DIR   = r"p:\train AI\final_phone_embedding_model"
-DEFAULT_RAG_DB_DIR  = r"p:\train AI\rag_db"
+BASE_DIR            = Path(__file__).resolve().parent
+DEFAULT_MODEL_DIR   = str(BASE_DIR / "final_phone_embedding_model")
+DEFAULT_RAG_DB_DIR  = str(BASE_DIR / "rag_db")
 DEFAULT_TOP_K       = 5
 BM25_CACHE_FILENAME = "bm25_index.pkl"
 
