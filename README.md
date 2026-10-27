@@ -55,7 +55,13 @@ python B5.py --dir /kaggle/working/database_phone_cleaned --model-dir /kaggle/wo
 
 # 8. Vận hành RAG & Đánh giá (B7)
 python B7.py --rag-db-dir /kaggle/working/rag_db --model-dir /kaggle/working/final_phone_embedding_model --eval
+
+# 9. Đóng gói & Xuất sang Google Drive
+# Folder: https://drive.google.com/drive/folders/1i8dvXQ5WDQruGCLV-WQMQNzsA7EwtGXr
+cd /kaggle/working
+zip -r -q phone_rag_data.zip AI_Phone/rag_db AI_Phone/final_phone_embedding_model
 ```
+
 
 ## 🛠️ Cài Đặt Môi Trường Cục Bộ (Local)
 
