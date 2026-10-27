@@ -24,7 +24,22 @@ try:
 except ImportError:
     tqdm = None
 
-DEFAULT_DATA_DIR = r"P:\database phone cleaned"
+def find_default_data_dir() -> str:
+    kaggle_paths = [
+        "/kaggle/working/database_phone_cleaned",
+        "/kaggle/input/database-phone-cleaned",
+        "/kaggle/input/phone-db-cleaned",
+    ]
+    for p in kaggle_paths:
+        if os.path.exists(p):
+            return p
+    if os.path.exists(r"P:\database phone cleaned"):
+        return r"P:\database phone cleaned"
+    if os.path.exists("database_phone_cleaned"):
+        return "database_phone_cleaned"
+    return "/kaggle/working/database_phone_cleaned" if os.path.exists("/kaggle") else r"P:\database phone cleaned"
+
+DEFAULT_DATA_DIR = find_default_data_dir()
 
 
 @dataclass
@@ -44,6 +59,7 @@ class PhoneDocument:
 def get_md_file_paths(data_dir: str | Path, pattern: str = "*.md") -> List[Path]:
     """
     Quét và lấy toàn bộ danh sách đường dẫn các file .md trong thư mục.
+    Hỗ trợ cả quét trực tiếp và đệ quy qua các thư mục con.
     """
     path = Path(data_dir)
     if not path.exists():
@@ -51,7 +67,10 @@ def get_md_file_paths(data_dir: str | Path, pattern: str = "*.md") -> List[Path]
     if not path.is_dir():
         raise NotADirectoryError(f"Đường dẫn không phải là thư mục: {path.resolve()}")
 
-    return sorted(list(path.glob(pattern)))
+    files = list(path.glob(pattern))
+    if not files:
+        files = list(path.rglob(pattern))
+    return sorted(files)
 
 
 def read_single_md_file(file_path: Path, encoding: str = "utf-8") -> Optional[PhoneDocument]:

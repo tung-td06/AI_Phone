@@ -69,9 +69,36 @@ from soc_database import lookup_soc_benchmark, SoCBenchmarkInfo, KNOWN_SOC_DATAB
 # ==============================================================================
 # HẰNG SỐ CẤU HÌNH HỆ THỐNG
 # ==============================================================================
-BASE_DIR            = Path(__file__).resolve().parent
-DEFAULT_MODEL_DIR   = str(BASE_DIR / "final_phone_embedding_model")
-DEFAULT_RAG_DB_DIR  = str(BASE_DIR / "rag_db")
+BASE_DIR = Path(__file__).resolve().parent
+
+def find_default_rag_db_dir() -> str:
+    candidates = [
+        str(BASE_DIR / "rag_db"),
+        "/kaggle/working/rag_db",
+        "/kaggle/input/rag-db",
+        "/kaggle/input/phone-rag-data/rag_db",
+        "/kaggle/input/phone-db-rag/rag_db",
+    ]
+    for c in candidates:
+        if os.path.exists(os.path.join(c, "index.faiss")):
+            return c
+    return str(BASE_DIR / "rag_db")
+
+def find_default_model_dir() -> str:
+    candidates = [
+        str(BASE_DIR / "final_phone_embedding_model"),
+        "/kaggle/working/final_phone_embedding_model",
+        "/kaggle/input/final-phone-embedding-model",
+        "/kaggle/input/phone-embedding-model",
+        "/kaggle/input/phone-rag-data/final_phone_embedding_model",
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return str(BASE_DIR / "final_phone_embedding_model")
+
+DEFAULT_RAG_DB_DIR  = find_default_rag_db_dir()
+DEFAULT_MODEL_DIR   = find_default_model_dir()
 DEFAULT_TOP_K       = 5
 BM25_CACHE_FILENAME = "bm25_index.pkl"
 
@@ -696,9 +723,17 @@ class HybridRetriever:
                 if vnd is not None:
                     self.source_file_to_price[sf] = (vnd, orig)
 
-        print(f" -> Đang nạp Embedding Model từ: {self.model_dir.resolve()} ...")
+        model_target = str(self.model_dir)
+        if not self.model_dir.exists():
+            print(f" [!] Cảnh báo: Không tìm thấy thư mục mô hình '{self.model_dir}'.")
+            print("     -> Tự động fallback sang mô hình nền chuẩn: 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'")
+            model_target = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+        else:
+            model_target = str(self.model_dir.resolve())
+
+        print(f" -> Đang nạp Embedding Model từ: {model_target} ...")
         t1 = time.time()
-        self.model = SentenceTransformer(str(self.model_dir), device=self.device)
+        self.model = SentenceTransformer(model_target, device=self.device)
         self.model.eval()
         print(f"    + Model sẵn sàng trong {time.time()-t1:.2f}s!")
 

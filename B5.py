@@ -75,11 +75,23 @@ from B2 import PhoneChunk, chunk_all_documents, CANONICAL_SECTIONS
 
 
 # ==============================================================================
-# HẰNG SỐ CẤU HÌNH MẶC ĐỊNH
-# ==============================================================================
-DEFAULT_MODEL_DIR = r"p:\train AI\final_phone_embedding_model"
-DEFAULT_OUTPUT_DIR = r"p:\train AI\phone_vector_db"
-DEFAULT_RAG_DB_DIR = r"p:\train AI\rag_db"
+BASE_DIR = Path(__file__).resolve().parent
+
+def find_default_model_dir() -> str:
+    candidates = [
+        str(BASE_DIR / "final_phone_embedding_model"),
+        "/kaggle/working/final_phone_embedding_model",
+        "/kaggle/input/final-phone-embedding-model",
+        "/kaggle/input/phone-embedding-model",
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return str(BASE_DIR / "final_phone_embedding_model")
+
+DEFAULT_MODEL_DIR = find_default_model_dir()
+DEFAULT_OUTPUT_DIR = str(BASE_DIR / "phone_vector_db")
+DEFAULT_RAG_DB_DIR = str(BASE_DIR / "rag_db")
 DEFAULT_BATCH_SIZE = 128
 DEFAULT_EMBEDDING_DIM = 384
 
@@ -234,8 +246,15 @@ def encode_database_chunks(
     """
     Sử dụng mô hình đã fine-tune để mã hóa toàn bộ văn bản của các chunks thành ma trận vector.
     """
-    model_path_str = str(Path(model_path).resolve())
-    print(f"\n -> Đang nạp mô hình Fine-tuned từ: {model_path_str} lên thiết bị '{device}'...")
+    model_p = Path(model_path)
+    if not model_p.exists():
+        print(f"\n [!] Cảnh báo: Không tìm thấy thư mục mô hình '{model_path}'.")
+        print("     -> Tự động fallback sang mô hình nền chuẩn: 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'")
+        model_path_str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    else:
+        model_path_str = str(model_p.resolve())
+
+    print(f"\n -> Đang nạp mô hình từ: {model_path_str} lên thiết bị '{device}'...")
     t_load_start = time.time()
 
     model = SentenceTransformer(model_path_str, device=device)
@@ -896,9 +915,9 @@ def main():
     print(f" CSDL FAISS RAG DB đã sẵn sàng tại : {Path(args.rag_db_dir).resolve()}")
     print(f" CSDL Matrix DB đã sẵn sàng tại    : {Path(args.output_dir).resolve()}")
     print(" Bạn có thể thử nghiệm tìm kiếm ngay bằng lệnh:")
-    print(f"   python \"p:\\train AI\\B5.py\" --search \"Pin iPhone 13 Pro Max dùng được bao lâu?\"")
+    print(f"   python B5.py --search \"Pin iPhone 13 Pro Max dung duoc bao lau?\"")
     print(" Hoặc mở giao diện chat tương tác:")
-    print(f"   python \"p:\\train AI\\B5.py\" --interactive")
+    print(f"   python B5.py --interactive")
     print("=" * 75)
 
 

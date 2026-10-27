@@ -411,6 +411,10 @@ if __name__ == "__main__":
     print(f"[ĐÃ TẠO] Script huấn luyện mẫu: {train_script_path.resolve()}")
 
 
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_FINETUNE_DIR = str(BASE_DIR / "dataset_finetune")
+
+
 # ==============================================================================
 # 5. HÀM CHÍNH VÀ GIAO DIỆN CLI
 # ==============================================================================
@@ -421,8 +425,8 @@ def main():
     parser.add_argument("--queries-per-chunk", type=int, default=2, help="Số câu hỏi sinh ra cho mỗi chunk (mặc định: 2)")
     parser.add_argument("--format", type=str, default="both", choices=["pairs", "triplets", "both"],
                         help="Định dạng dữ liệu: 'pairs' (Query-Positive), 'triplets' (Anchor-Pos-Neg), hoặc 'both'")
-    parser.add_argument("--output-dir", type=str, default=r"p:\train AI\dataset_finetune",
-                        help="Thư mục lưu dataset xuất ra (mặc định: p:\\train AI\\dataset_finetune)")
+    parser.add_argument("--output-dir", type=str, default=DEFAULT_FINETUNE_DIR,
+                        help=f"Thư mục lưu dataset xuất ra (mặc định: {DEFAULT_FINETUNE_DIR})")
     parser.add_argument("--train-ratio", type=float, default=0.9, help="Tỷ lệ tập Train (mặc định: 0.9 = 90% train, 10% val)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed để tái lập kết quả")
 

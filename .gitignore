@@ -17,9 +17,13 @@ rag_db/
 *.safetensors
 *.pth
 *.onnx
+*.zip
+*.tar.gz
+*.7z
 
 # IDE & OS files
 .vscode/
 .idea/
 *.log
 .DS_Store
+

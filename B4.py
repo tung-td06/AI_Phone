@@ -69,9 +69,22 @@ except ImportError:
 # HẰNG SỐ CẤU HÌNH MẶC ĐỊNH
 # ==============================================================================
 DEFAULT_BASE_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-DEFAULT_DATA_DIR = Path(r"p:\train AI\dataset_finetune")
-DEFAULT_OUTPUT_DIR = Path(r"p:\train AI\final_phone_embedding_model")
-DEFAULT_CHECKPOINT_DIR = Path(r"p:\train AI\checkpoints_phone_embedding")
+BASE_DIR = Path(__file__).resolve().parent
+
+def find_default_finetune_dir() -> Path:
+    candidates = [
+        BASE_DIR / "dataset_finetune",
+        Path("/kaggle/working/dataset_finetune"),
+        Path("/kaggle/input/dataset-finetune"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return BASE_DIR / "dataset_finetune"
+
+DEFAULT_DATA_DIR = find_default_finetune_dir()
+DEFAULT_OUTPUT_DIR = BASE_DIR / "final_phone_embedding_model"
+DEFAULT_CHECKPOINT_DIR = BASE_DIR / "checkpoints_phone_embedding"
 DEFAULT_MAX_SEQ_LENGTH = 256
 DEFAULT_BATCH_SIZE = 32
 DEFAULT_EPOCHS = 1
